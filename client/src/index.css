@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* slate dark + green primary — shadcn-compatible HSL tokens */
+    --background: 222 47% 5%;
+    --foreground: 210 40% 96%;
+    --card: 222 44% 9%;
+    --card-foreground: 210 40% 96%;
+    --primary: 142 71% 45%;          /* green-500 */
+    --primary-foreground: 144 80% 8%;
+    --secondary: 217 33% 18%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 217 33% 14%;
+    --muted-foreground: 215 20% 68%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 144 80% 8%;
+    --destructive: 0 84% 63%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 33% 20%;
+    --input: 222 33% 20%;
+    --ring: 142 71% 45%;
+    --radius: 0.7rem;
+  }
+
+  * { border-color: hsl(var(--border)); }
+  html, body, #root { height: 100%; }
+  body {
+    margin: 0;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: theme('fontFamily.sans');
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.006em;
+  }
+  ::selection { background: rgba(34, 197, 94, .28); color: #fff; }
+}
+
+@layer utilities {
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .text-balance { text-wrap: balance; }
+}
+
+@layer components {
+  .code-block {
+    font-family: theme('fontFamily.mono');
+    background: #05080f;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    overflow: auto;
+    white-space: pre;
+    tab-size: 4;
+    line-height: 1.6;
+  }
+  .tok-kw { color: #7dd3fc; }
+  .tok-str { color: #86efac; }
+  .tok-num { color: #93c5fd; }
+  .tok-com { color: #64748b; font-style: italic; }
+  .tok-fn { color: #c4b5fd; }
+  .tok-builtin { color: #fcd34d; }
+}
+
+/* Title "gradually appears from the effect": fade up + de-blur over the decrypt. */
+@keyframes titleIn {
+  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+.animate-title-in { animation: titleIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-title-in { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
