@@ -1,0 +1,14 @@
+{
+  "files.exclude": {
+    "**/node_modules": true,
+    "client/dist": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "client/dist": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "client/dist/**": true
+  }
+}
