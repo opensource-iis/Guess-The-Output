@@ -1,0 +1,28 @@
+{
+  "name": "guess-the-output",
+  "version": "1.0.0",
+  "description": "Live, host-led, multiplayer Python output-prediction game for classrooms (grades 6-12).",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "npm --prefix client install && npm --prefix client run build",
+    "smoke": "node test/smoke.js",
+    "filters": "node test/filters.js",
+    "mcq": "node test/mcq.js",
+    "verify": "node tools/verify_all.js",
+    "test": "node test/smoke.js && node test/filters.js && node test/mcq.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "shadcn": "^4.12.0",
+    "socket.io-client": "^4.7.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
