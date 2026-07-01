@@ -11,6 +11,10 @@ const HERO = `def counter(start=[]):
 
 print(counter(), counter(), counter())`
 
+// The hero snippet actually prints "1 2 3" — the default list is shared across the calls.
+const HERO_OUTPUT = '1 2 3'
+const normOut = (s: string) => s.trim().replace(/\s+/g, ' ')
+
 const CODE_LEN = 4
 
 function cleanChar(v: string): string {
@@ -29,6 +33,18 @@ export default function Landing() {
   const [error, setError] = useState('')
   const boxRefs = useRef<(HTMLInputElement | null)[]>([])
   const code = chars.join('')
+
+  // Interactive demo — the visitor predicts the output right on the landing.
+  const [guess, setGuess] = useState('')
+  const [checked, setChecked] = useState<null | 'correct' | 'wrong'>(null)
+  function submitGuess(e: React.FormEvent) {
+    e.preventDefault()
+    setChecked(normOut(guess) === normOut(HERO_OUTPUT) ? 'correct' : 'wrong')
+  }
+  function resetGuess() {
+    setGuess('')
+    setChecked(null)
+  }
 
   function setChar(i: number, raw: string) {
     const c = cleanChar(raw)
@@ -75,16 +91,6 @@ export default function Landing() {
   return (
     <main className="relative min-h-full">
       <div className="mx-auto flex min-h-full w-full max-w-4xl flex-col justify-center gap-9 px-5 py-12 sm:py-16">
-        {/* Live badge with a real pulsing dot */}
-        <div className="flex items-center gap-2.5">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-70" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
-          </span>
-          <span className="font-display text-xs font-semibold uppercase tracking-[0.25em] text-primary">Live</span>
-          <span className="font-display text-xs uppercase tracking-[0.25em] text-muted-foreground">· Python</span>
-        </div>
-
         {/* SIGNATURE — the snippet is the hero, not a headline over noise */}
         <section className="animate-title-in">
           <div className="overflow-x-auto rounded-xl border border-border bg-[#0c0a09] px-5 py-5 shadow-sm sm:px-6 sm:py-6">
@@ -92,11 +98,46 @@ export default function Landing() {
               className="font-mono text-[15px] leading-relaxed text-foreground sm:text-lg"
               dangerouslySetInnerHTML={{ __html: highlighted }}
             />
-            <div className="mt-2 font-mono text-[15px] text-muted-foreground sm:text-lg">
-              &gt;&gt;&gt; <span className="animate-blink text-primary">▋</span>
-            </div>
+            {checked === null ? (
+              <form onSubmit={submitGuess} className="mt-2 flex items-center gap-2 font-mono text-[15px] sm:text-lg">
+                <span className="shrink-0 text-muted-foreground">&gt;&gt;&gt;</span>
+                <input
+                  value={guess}
+                  onChange={(e) => setGuess(e.target.value)}
+                  placeholder="type the output…"
+                  aria-label="Predict the output"
+                  autoComplete="off"
+                  spellCheck={false}
+                  className="min-w-0 flex-1 bg-transparent font-mono text-foreground caret-primary outline-none placeholder:text-muted-foreground/40"
+                />
+                <button type="submit" className="shrink-0 font-display text-xs uppercase tracking-wide text-primary hover:underline">
+                  check
+                </button>
+              </form>
+            ) : (
+              <div className="mt-2 font-mono text-[15px] sm:text-lg">
+                <div>
+                  <span className="text-muted-foreground">&gt;&gt;&gt;</span>{' '}
+                  <span className="text-foreground">{guess.trim() || '(nothing)'}</span>
+                </div>
+                {checked === 'correct' ? (
+                  <p className="mt-1 text-primary">✓ nice — it prints <span className="font-bold">1 2 3</span></p>
+                ) : (
+                  <p className="mt-1 text-destructive">
+                    ✗ not quite — it prints <span className="font-bold text-foreground">1 2 3</span> (the default list is shared)
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={resetGuess}
+                  className="mt-1 font-display text-xs uppercase tracking-wide text-muted-foreground hover:text-foreground"
+                >
+                  try again
+                </button>
+              </div>
+            )}
           </div>
-          <p className="mt-3 font-display text-sm text-muted-foreground">// read it — what does it print?</p>
+          <p className="mt-3 font-display text-sm text-muted-foreground">// predict the output — then press check</p>
         </section>
 
         {/* RESOLUTION — the game name + actions sit below the signature */}
@@ -108,9 +149,9 @@ export default function Landing() {
           <div className="mt-6 grid gap-4 lg:grid-cols-[1.6fr_1fr]">
             {/* HOST — the dominant action (violet host emphasis), 3D tilt card */}
             <TiltedCard className="relative overflow-hidden rounded-xl border border-border bg-card p-6 sm:p-7" rotateAmplitude={9}>
-              <span className="absolute inset-x-0 top-0 h-0.5 bg-keyword/70" aria-hidden="true" />
+              <span className="absolute inset-x-0 top-0 h-0.5 bg-primary/70" aria-hidden="true" />
               <div className="flex h-full flex-col">
-                <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-keyword">Host</span>
+                <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">Host</span>
                 <h2 className="mt-2 font-display text-2xl font-bold text-foreground">Run the room</h2>
                 <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
                   Pick the topics and difficulty, then put a room code on the projector for the class to join.
@@ -123,10 +164,10 @@ export default function Landing() {
 
             {/* JOIN — compact, one-thumb (amber join emphasis), 3D tilt card */}
             <TiltedCard className="relative overflow-hidden rounded-xl border border-border bg-card p-6 sm:p-7" rotateAmplitude={9}>
-              <span className="absolute inset-x-0 top-0 h-0.5 bg-string/70" aria-hidden="true" />
+              <span className="absolute inset-x-0 top-0 h-0.5 bg-primary/70" aria-hidden="true" />
               <form onSubmit={handleJoin} className="flex h-full flex-col" noValidate>
-              <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-string">Join</span>
-              <h2 className="mt-2 font-display text-2xl font-bold text-foreground">On your phone</h2>
+              <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">Join</span>
+              <h2 className="mt-2 font-display text-2xl font-bold text-foreground">Jump in</h2>
 
               <div className="mt-4 flex flex-wrap items-end gap-x-3 gap-y-3">
                 <div>
