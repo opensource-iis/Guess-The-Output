@@ -3,6 +3,8 @@ import { highlightPython } from '@/lib/highlight'
 import { Button } from '@/components/ui/button'
 import TiltedCard from '@/components/ui/tilted-card'
 import BorderGlow from '@/components/ui/border-glow'
+import DecryptedText from '@/components/ui/decrypted-text'
+import ScrambledText from '@/components/ui/scrambled-text'
 
 // The signature: a real, correct, slightly tricky snippet (the mutable-default gotcha —
 // prints "1 2 3", not "1 1 1"). The hero ends in a blinking >>> where the answer would go.
@@ -144,8 +146,28 @@ export default function Landing() {
         {/* RESOLUTION — the game name + actions sit below the signature */}
         <section>
           <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Guess the <span className="text-primary">Output</span>
+            <DecryptedText
+              text="Guess the "
+              animateOn="view"
+              sequential
+              revealDirection="center"
+              speed={70}
+              className="text-foreground"
+              encryptedClassName="text-primary/40"
+            />
+            <DecryptedText
+              text="Output"
+              animateOn="view"
+              sequential
+              revealDirection="center"
+              speed={70}
+              className="text-primary"
+              encryptedClassName="text-primary/40"
+            />
           </h1>
+          <ScrambledText className="mt-2 text-sm text-muted-foreground sm:text-base" radius={80} duration={1} speed={0.4}>
+            Read the Python. Predict exactly what it prints.
+          </ScrambledText>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-[1.6fr_1fr]">
             {/* HOST — dominant action; the card you liked, now with tilt + BorderGlow */}
