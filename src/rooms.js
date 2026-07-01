@@ -468,7 +468,7 @@ class Room {
     // Score everyone NOW (server-authoritative).
     for (const p of this.players.values()) {
       if (p.answered) answeredCount += 1;
-      const isCorrect = p.answered && grade(p.currentAnswer, snippet);
+      const isCorrect = p.answered && grade(p.currentAnswer, snippet, this.answerMode === ANSWER_MODE.MCQ);
       let points = 0;
       if (isCorrect) {
         correctCount += 1;
