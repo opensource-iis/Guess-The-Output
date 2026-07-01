@@ -5,8 +5,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        // Body only — quiet humanist sans, zero personality.
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        // Display + code — the product's whole world is monospaced.
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        display: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -20,6 +23,9 @@ export default {
         accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
         card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
         destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
+        // Function-locked syntax accents (from Python highlight semantics).
+        keyword: 'hsl(var(--keyword))',
+        string: 'hsl(var(--string))',
         // direct brand greens for component use
         brand: {
           DEFAULT: '#22c55e',
