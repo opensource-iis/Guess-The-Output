@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MODE, CONTENT, DIFFICULTY, ANSWER_MODE, DEFAULTS } from '@/lib/protocol'
 import type { BankMeta } from '@/lib/protocol'
+import AnimatedList from '@/components/ui/animated-list'
 import { Button } from './ui'
 
 export interface CreateOpts {
@@ -171,6 +172,12 @@ export default function SetupView({
     return rows
   }, [meta])
 
+  const topicItems = useMemo(
+    () => topics.map((t) => (t.count != null ? `${t.label} (${t.count})` : t.label)),
+    [topics],
+  )
+  const topicValues = useMemo(() => topics.map((t) => t.value), [topics])
+
   const matchCount = useMemo(() => {
     if (!meta || !meta.tags) return null
     let n = 0
@@ -218,35 +225,16 @@ export default function SetupView({
             <span className="mb-2 block font-display text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
               Topic
             </span>
-            <div className="relative">
-              <ul className="max-h-[300px] space-y-1.5 overflow-y-auto pr-1 scrollbar-hide" aria-label="Topics">
-                {topics.map((t) => {
-                  const active = t.value === topic
-                  return (
-                    <li key={t.value}>
-                      <button
-                        type="button"
-                        onClick={() => setTopic(t.value)}
-                        className={`flex w-full items-center gap-3 rounded-lg border-2 px-3 py-2.5 text-left transition-colors ${
-                          active
-                            ? 'border-primary bg-primary/15 text-foreground'
-                            : 'border-transparent bg-background/40 text-muted-foreground hover:bg-background/70 hover:text-foreground'
-                        }`}
-                      >
-                        <span className={`h-5 w-1 shrink-0 rounded-full ${active ? 'bg-primary' : 'bg-transparent'}`} aria-hidden="true" />
-                        <span className="flex-1 truncate font-display text-base">{t.label}</span>
-                        {t.count != null && (
-                          <span className={`font-display text-sm tabular ${active ? 'text-primary' : 'text-muted-foreground/70'}`}>
-                            {t.count}
-                          </span>
-                        )}
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-lg bg-gradient-to-t from-card to-transparent" />
-            </div>
+            <AnimatedList
+              key={topicItems.length}
+              items={topicItems}
+              initialSelectedIndex={Math.max(0, topicValues.indexOf(topic))}
+              onItemSelect={(_item, index) => setTopic(topicValues[index] ?? 'all')}
+              showGradients
+              displayScrollbar={false}
+              enableArrowNavigation={false}
+              maxHeight="300px"
+            />
           </div>
 
           {/* Live counter + the decisive action */}

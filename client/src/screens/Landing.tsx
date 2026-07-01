@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { highlightPython } from '@/lib/highlight'
 import { Button } from '@/components/ui/button'
+import TiltedCard from '@/components/ui/tilted-card'
 
 // The signature: a real, correct, slightly tricky snippet (the mutable-default gotcha —
 // prints "1 2 3", not "1 1 1"). The hero ends in a blinking >>> where the answer would go.
@@ -105,26 +106,25 @@ export default function Landing() {
           </h1>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-[1.6fr_1fr]">
-            {/* HOST — the dominant action (violet host emphasis) */}
-            <div className="relative overflow-hidden rounded-xl border border-border bg-card p-6 sm:p-7">
+            {/* HOST — the dominant action (violet host emphasis), 3D tilt card */}
+            <TiltedCard className="relative overflow-hidden rounded-xl border border-border bg-card p-6 sm:p-7" rotateAmplitude={9}>
               <span className="absolute inset-x-0 top-0 h-0.5 bg-keyword/70" aria-hidden="true" />
-              <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-keyword">Host</span>
-              <h2 className="mt-2 font-display text-2xl font-bold text-foreground">Run the room</h2>
-              <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-                Pick the topics and difficulty, then put a room code on the projector for the class to join.
-              </p>
-              <Button size="lg" onClick={() => go('/host')} className="mt-5">
-                Host game
-              </Button>
-            </div>
+              <div className="flex h-full flex-col">
+                <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-keyword">Host</span>
+                <h2 className="mt-2 font-display text-2xl font-bold text-foreground">Run the room</h2>
+                <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+                  Pick the topics and difficulty, then put a room code on the projector for the class to join.
+                </p>
+                <Button size="lg" onClick={() => go('/host')} className="mt-6">
+                  Host game
+                </Button>
+              </div>
+            </TiltedCard>
 
-            {/* JOIN — compact, one-thumb (amber join emphasis) */}
-            <form
-              onSubmit={handleJoin}
-              className="relative overflow-hidden rounded-xl border border-border bg-card p-6 sm:p-7"
-              noValidate
-            >
+            {/* JOIN — compact, one-thumb (amber join emphasis), 3D tilt card */}
+            <TiltedCard className="relative overflow-hidden rounded-xl border border-border bg-card p-6 sm:p-7" rotateAmplitude={9}>
               <span className="absolute inset-x-0 top-0 h-0.5 bg-string/70" aria-hidden="true" />
+              <form onSubmit={handleJoin} className="flex h-full flex-col" noValidate>
               <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-string">Join</span>
               <h2 className="mt-2 font-display text-2xl font-bold text-foreground">On your phone</h2>
 
@@ -175,10 +175,11 @@ export default function Landing() {
                 {error}
               </p>
 
-              <Button type="submit" variant="neutral" className="mt-1 w-full">
+              <Button type="submit" variant="neutral" className="mt-auto w-full">
                 Join
               </Button>
-            </form>
+              </form>
+            </TiltedCard>
           </div>
         </section>
       </div>
