@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { highlightPython } from '@/lib/highlight'
 import { Button } from '@/components/ui/button'
 import TiltedCard from '@/components/ui/tilted-card'
+import BorderGlow from '@/components/ui/border-glow'
 
 // The signature: a real, correct, slightly tricky snippet (the mutable-default gotcha —
 // prints "1 2 3", not "1 1 1"). The hero ends in a blinking >>> where the answer would go.
@@ -147,25 +148,46 @@ export default function Landing() {
           </h1>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-[1.6fr_1fr]">
-            {/* HOST — the dominant action (violet host emphasis), 3D tilt card */}
-            <TiltedCard className="relative overflow-hidden rounded-xl border border-border bg-card p-6 sm:p-7" rotateAmplitude={9}>
-              <span className="absolute inset-x-0 top-0 h-0.5 bg-primary/70" aria-hidden="true" />
-              <div className="flex h-full flex-col">
-                <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">Host</span>
-                <h2 className="mt-2 font-display text-2xl font-bold text-foreground">Run the room</h2>
-                <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-                  Pick the topics and difficulty, then put a room code on the projector for the class to join.
-                </p>
-                <Button size="lg" onClick={() => go('/host')} className="mt-6">
-                  Host game
-                </Button>
-              </div>
+            {/* HOST — dominant action; the card you liked, now with tilt + BorderGlow */}
+            <TiltedCard className="h-full rounded-xl" rotateAmplitude={8}>
+              <BorderGlow
+                className="h-full"
+                backgroundColor="#19171A"
+                borderRadius={12}
+                glowColor="146 65 55"
+                colors={['#3ecf7e', '#4ade80', '#22c55e']}
+                edgeSensitivity={38}
+                glowIntensity={0.65}
+                coneSpread={34}
+              >
+                <span className="h-0.5 w-full shrink-0 bg-primary/70" aria-hidden="true" />
+                <div className="flex flex-1 flex-col p-6 sm:p-7">
+                  <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">Host</span>
+                  <h2 className="mt-2 font-display text-2xl font-bold text-foreground">Run the room</h2>
+                  <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+                    Pick the topics and difficulty, then put a room code on the projector for the class to join.
+                  </p>
+                  <Button size="lg" onClick={() => go('/host')} className="mt-6">
+                    Host game
+                  </Button>
+                </div>
+              </BorderGlow>
             </TiltedCard>
 
-            {/* JOIN — compact, one-thumb (amber join emphasis), 3D tilt card */}
-            <TiltedCard className="relative overflow-hidden rounded-xl border border-border bg-card p-6 sm:p-7" rotateAmplitude={9}>
-              <span className="absolute inset-x-0 top-0 h-0.5 bg-primary/70" aria-hidden="true" />
-              <form onSubmit={handleJoin} className="flex h-full flex-col" noValidate>
+            {/* JOIN — compact; same card, now with tilt + BorderGlow */}
+            <TiltedCard className="h-full rounded-xl" rotateAmplitude={8}>
+              <BorderGlow
+                className="h-full"
+                backgroundColor="#19171A"
+                borderRadius={12}
+                glowColor="146 65 55"
+                colors={['#3ecf7e', '#4ade80', '#22c55e']}
+                edgeSensitivity={38}
+                glowIntensity={0.65}
+                coneSpread={34}
+              >
+                <span className="h-0.5 w-full shrink-0 bg-primary/70" aria-hidden="true" />
+                <form onSubmit={handleJoin} className="flex flex-1 flex-col p-6 sm:p-7" noValidate>
               <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">Join</span>
               <h2 className="mt-2 font-display text-2xl font-bold text-foreground">Jump in</h2>
 
@@ -219,7 +241,8 @@ export default function Landing() {
               <Button type="submit" variant="neutral" className="mt-auto w-full">
                 Join
               </Button>
-              </form>
+                </form>
+              </BorderGlow>
             </TiltedCard>
           </div>
         </section>
