@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MODE, CONTENT, DIFFICULTY, ANSWER_MODE, DEFAULTS } from '@/lib/protocol'
 import type { BankMeta } from '@/lib/protocol'
 import AnimatedList from '@/components/ui/animated-list'
+import { highlightPython } from '@/lib/highlight'
 import { Button } from './ui'
 
 export interface CreateOpts {
@@ -152,6 +153,7 @@ export default function SetupView({
   const [roundCount, setRoundCount] = useState<number>(10)
   const [timerSeconds, setTimerSeconds] = useState<number>(DEFAULTS.FULL_TIMER)
   const [meta, setMeta] = useState<BankMeta | null>(null)
+  const [sample, setSample] = useState<string | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -165,6 +167,24 @@ export default function SetupView({
       alive = false
     }
   }, [])
+
+  // Pull a fresh example snippet (code only, no answer) whenever the filters change,
+  // so the host sees what kind of question this round will ask.
+  useEffect(() => {
+    let alive = true
+    const params = new URLSearchParams({ content, difficulty, topic })
+    fetch(`/api/sample?${params.toString()}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (alive) setSample(d && d.code ? d.code : null)
+      })
+      .catch(() => {
+        if (alive) setSample(null)
+      })
+    return () => {
+      alive = false
+    }
+  }, [content, difficulty, topic])
 
   const topics = useMemo(() => {
     const rows = [{ value: 'all', label: 'All topics', count: meta?.total ?? null }]
@@ -237,16 +257,35 @@ export default function SetupView({
             />
           </div>
 
-          {/* Live counter + the decisive action */}
+          {/* Live counter + example question + the decisive action */}
           <div className="flex flex-col gap-4">
-            <div className={`flex flex-1 flex-col justify-center rounded-xl border-2 bg-card px-6 py-5 ${noMatches ? 'border-destructive/50' : 'border-primary/30'}`}>
-              <div className={`font-display text-6xl font-bold tabular leading-none sm:text-7xl ${noMatches ? 'text-destructive' : 'text-primary'}`}>
+            <div className={`rounded-xl border-2 bg-card px-6 py-4 ${noMatches ? 'border-destructive/50' : 'border-primary/30'}`}>
+              <div className={`font-display text-5xl font-bold tabular leading-none sm:text-6xl ${noMatches ? 'text-destructive' : 'text-primary'}`}>
                 {matchCount ?? '—'}
               </div>
-              <div className="mt-2 font-display text-sm uppercase tracking-[0.12em] text-muted-foreground">
+              <div className="mt-1.5 font-display text-sm uppercase tracking-[0.12em] text-muted-foreground">
                 {noMatches ? 'no snippets match — loosen the filters' : 'snippets match your filters'}
               </div>
             </div>
+
+            {/* Example question — refreshes as topic/difficulty change */}
+            <div className="flex flex-1 flex-col rounded-xl border-2 border-border bg-card p-4">
+              <span className="mb-2 block font-display text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                Example question
+              </span>
+              {sample ? (
+                <pre
+                  className="min-h-[7rem] flex-1 overflow-auto rounded-lg bg-[#0c0a09] p-3 font-mono text-[13px] leading-relaxed text-foreground"
+                  dangerouslySetInnerHTML={{ __html: highlightPython(sample) }}
+                />
+              ) : (
+                <div className="grid min-h-[7rem] flex-1 place-items-center rounded-lg bg-[#0c0a09] text-sm text-muted-foreground">
+                  {noMatches ? 'no match' : 'loading an example…'}
+                </div>
+              )}
+              <p className="mt-2 font-display text-xs text-muted-foreground">// what students will see</p>
+            </div>
+
             <Button type="submit" size="lg" disabled={!canHost} className="w-full">
               Host game
             </Button>

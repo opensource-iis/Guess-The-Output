@@ -23,7 +23,7 @@ const { Server } = require('socket.io');
 
 const PROTO = require('./src/protocol.js');
 const { RoomManager } = require('./src/rooms.js');
-const { getMeta } = require('./src/snippets.js');
+const { getMeta, getSnippets } = require('./src/snippets.js');
 
 const { EV } = PROTO;
 const PORT = Number(process.env.PORT) || 3000;
@@ -74,6 +74,19 @@ const io = new Server(server, {
 // and show live "N snippets match" counts without shipping the answers to the client.
 app.get('/api/meta', (_req, res) => {
   res.json(getMeta());
+});
+
+// A single example snippet matching the host's current filters, for the setup preview.
+// Returns the CODE only (never the output/answer), so it's safe to show before a round.
+app.get('/api/sample', (req, res) => {
+  const matches = getSnippets({
+    content: req.query.content,
+    difficulty: req.query.difficulty,
+    topic: req.query.topic,
+  });
+  if (!matches.length) return res.json({ code: null });
+  const s = matches[Math.floor(Math.random() * matches.length)];
+  res.json({ code: s.code, tier: s.tier, difficulty: s.difficulty, topic: s.topic, isError: !!s.is_error });
 });
 
 // Serve the built React client (Vite output). Run `npm run build` first.
