@@ -151,7 +151,7 @@ export default function Landing() {
               animateOn="view"
               sequential
               revealDirection="center"
-              speed={70}
+              speed={150}
               className="text-foreground"
               encryptedClassName="text-primary/40"
             />
@@ -160,7 +160,7 @@ export default function Landing() {
               animateOn="view"
               sequential
               revealDirection="center"
-              speed={70}
+              speed={150}
               className="text-primary"
               encryptedClassName="text-primary/40"
             />
