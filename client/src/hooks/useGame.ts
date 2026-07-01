@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { EV, GameState, ResultView } from '@/lib/protocol'
+import { API_BASE } from '@/lib/api'
 
 /**
  * The single realtime hook for both host and player. Connects to the same-origin Socket.IO
@@ -18,7 +19,7 @@ export function useGame() {
   const [roomClosed, setRoomClosed] = useState<string | null>(null)
 
   useEffect(() => {
-    const socket = io({ autoConnect: true })
+    const socket = io(API_BASE || undefined, { autoConnect: true })
     socketRef.current = socket
 
     socket.on('connect', () => setConnected(true))

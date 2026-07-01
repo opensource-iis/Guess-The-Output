@@ -4,6 +4,7 @@ import type { BankMeta } from '@/lib/protocol'
 import AnimatedList from '@/components/ui/animated-list'
 import DecryptedText from '@/components/ui/decrypted-text'
 import { highlightPython } from '@/lib/highlight'
+import { API_BASE } from '@/lib/api'
 import { Button } from './ui'
 
 export interface CreateOpts {
@@ -159,7 +160,7 @@ export default function SetupView({
 
   useEffect(() => {
     let alive = true
-    fetch('/api/meta')
+    fetch(`${API_BASE}/api/meta`)
       .then((r) => r.json())
       .then((m: BankMeta) => {
         if (alive && m && m.tags) setMeta(m)
@@ -177,7 +178,7 @@ export default function SetupView({
     setSample(null)
     setSampleErr(false)
     const params = new URLSearchParams({ content, difficulty, topic })
-    fetch(`/api/sample?${params.toString()}`)
+    fetch(`${API_BASE}/api/sample?${params.toString()}`)
       .then((r) => {
         const ct = r.headers.get('content-type') || ''
         // A stale server (no /api/sample) falls through to the SPA and returns HTML — treat as an error.
@@ -243,7 +244,7 @@ export default function SetupView({
             animateOn="view"
             sequential
             revealDirection="center"
-            speed={70}
+            speed={150}
             className="text-foreground"
             encryptedClassName="text-primary/40"
           />

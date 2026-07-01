@@ -70,6 +70,12 @@ const io = new Server(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] }
 });
 
+// Allow a separately-hosted frontend (e.g. on Vercel) to call the API cross-origin.
+app.use('/api', (_req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
+
 // Snippet-bank metadata so the host setup screen can build its topic/difficulty filters
 // and show live "N snippets match" counts without shipping the answers to the client.
 app.get('/api/meta', (_req, res) => {
