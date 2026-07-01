@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MODE, CONTENT, DIFFICULTY, ANSWER_MODE, DEFAULTS } from '@/lib/protocol'
 import type { BankMeta } from '@/lib/protocol'
 import AnimatedList from '@/components/ui/animated-list'
+import DecryptedText from '@/components/ui/decrypted-text'
 import { highlightPython } from '@/lib/highlight'
 import { Button } from './ui'
 
@@ -154,6 +155,7 @@ export default function SetupView({
   const [timerSeconds, setTimerSeconds] = useState<number>(DEFAULTS.FULL_TIMER)
   const [meta, setMeta] = useState<BankMeta | null>(null)
   const [sample, setSample] = useState<string | null>(null)
+  const [sampleErr, setSampleErr] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -172,14 +174,21 @@ export default function SetupView({
   // so the host sees what kind of question this round will ask.
   useEffect(() => {
     let alive = true
+    setSample(null)
+    setSampleErr(false)
     const params = new URLSearchParams({ content, difficulty, topic })
     fetch(`/api/sample?${params.toString()}`)
-      .then((r) => r.json())
+      .then((r) => {
+        const ct = r.headers.get('content-type') || ''
+        // A stale server (no /api/sample) falls through to the SPA and returns HTML — treat as an error.
+        if (!r.ok || !ct.includes('application/json')) throw new Error('unavailable')
+        return r.json()
+      })
       .then((d) => {
         if (alive) setSample(d && d.code ? d.code : null)
       })
       .catch(() => {
-        if (alive) setSample(null)
+        if (alive) setSampleErr(true)
       })
     return () => {
       alive = false
@@ -227,8 +236,18 @@ export default function SetupView({
   return (
     <div className="mx-auto flex min-h-full w-full max-w-5xl flex-col px-4 py-6">
       <header className="animate-title-in mb-5">
-        <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-keyword">Host control panel</span>
-        <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Host a game</h1>
+        <span className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-primary">Host control panel</span>
+        <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <DecryptedText
+            text="Host a game"
+            animateOn="view"
+            sequential
+            revealDirection="center"
+            speed={70}
+            className="text-foreground"
+            encryptedClassName="text-primary/40"
+          />
+        </h1>
       </header>
 
       <form
@@ -284,6 +303,10 @@ export default function SetupView({
               className="max-h-56 overflow-auto rounded-lg bg-[#0c0a09] p-4 font-mono text-sm leading-relaxed text-foreground"
               dangerouslySetInnerHTML={{ __html: highlightPython(sample) }}
             />
+          ) : sampleErr ? (
+            <div className="grid h-24 place-items-center rounded-lg bg-[#0c0a09] px-4 text-center text-sm text-muted-foreground">
+              Couldn't load an example — restart the server (<span className="font-mono text-foreground">npm start</span>) so /api/sample is served.
+            </div>
           ) : (
             <div className="grid h-24 place-items-center rounded-lg bg-[#0c0a09] text-sm text-muted-foreground">
               {noMatches ? 'no snippets match these filters' : 'loading an example…'}
