@@ -1,0 +1,18 @@
+# Render Blueprint — deploys the whole app (Express + Socket.IO + the built React
+# client) as ONE persistent web service. This is what the game needs: a long-lived
+# process that holds WebSocket connections and in-memory room state. Serverless
+# platforms (Vercel / Netlify / GitHub Pages) can't do that — they're stateless and
+# per-request, which is why the Vercel deploy 500s.
+#
+# Deploy: push this repo, then on https://render.com -> New -> Blueprint -> pick this
+# repo. Render builds the Dockerfile (which builds client/ and runs server.js) and
+# gives you a public https URL with WebSockets working. PORT is injected by Render and
+# read via process.env.PORT.
+services:
+  - type: web
+    name: guess-the-output
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/meta
+    autoDeploy: true
