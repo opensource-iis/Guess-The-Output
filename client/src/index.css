@@ -2,95 +2,221 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    /* Warm near-black terminal + three syntax-locked accents (keyword/string/number). */
-    --background: 20 10% 6%;      /* #100E0D warm near-black */
-    --foreground: 30 13% 94%;     /* #F2F0EE */
-    --card: 280 6% 10%;           /* #19171A surface — primary containers only */
-    --card-foreground: 30 13% 94%;
-    --primary: 146 60% 53%;       /* #3ECF7E refined green — actions + selected */
-    --primary-foreground: 146 45% 8%;
-    --secondary: 285 5% 15%;
-    --secondary-foreground: 30 13% 94%;
-    --muted: 285 5% 13%;
-    --muted-foreground: 30 3% 53%; /* #8C8884 */
-    --accent: 146 60% 53%;
-    --accent-foreground: 146 45% 8%;
-    --destructive: 0 72% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 24 7% 16%;
-    --input: 24 7% 16%;
-    --ring: 146 60% 53%;
-    --keyword: 276 68% 75%;       /* #C792EA violet — Python keywords / host emphasis */
-    --string: 42 74% 57%;         /* #E3B341 amber — Python strings / join emphasis */
-    --radius: 0.6rem;
+/* DESIGN.md — strict monochrome, one hue family, three lightness steps. */
+:root {
+  --term-bg: #0a0f0a;
+  --term-green: #87ed7a;
+  --term-green-bright: #b6ffa8;
+  --term-green-dim: #5c9c52;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--term-bg);
+  color: var(--term-green);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  overflow: hidden;
+}
+
+/* Whitespace is sacrosanct: snippets always render with pre, never pre-wrap. */
+.term-pre {
+  white-space: pre;
+}
+
+/* Ordinary output can wrap, but preserves internal spacing. */
+.term-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.font-flavor {
+  font-family: 'VT323', 'JetBrains Mono', monospace;
+}
+
+/* The blinking block cursor. */
+@keyframes term-blink {
+  0%,
+  49% {
+    opacity: 1;
   }
-
-  * { border-color: hsl(var(--border)); }
-  html, body, #root { height: 100%; }
-  body {
-    margin: 0;
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: theme('fontFamily.sans');
-    -webkit-font-smoothing: antialiased;
-    letter-spacing: -0.006em;
-  }
-  ::selection { background: hsl(146 60% 53% / .3); color: #fff; }
-}
-
-@layer utilities {
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  .text-balance { text-wrap: balance; }
-  .tabular { font-variant-numeric: tabular-nums; }
-  /* near-invisible dot grid for depth (replaces the digital-rain texture) */
-  .dot-grid {
-    background-image: radial-gradient(circle, hsl(30 13% 94% / 0.035) 1px, transparent 1px);
-    background-size: 22px 22px;
+  50%,
+  100% {
+    opacity: 0;
   }
 }
 
-@layer components {
-  .code-block {
-    font-family: theme('fontFamily.mono');
-    background: #0c0a09;
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.6rem;
-    overflow: auto;
-    white-space: pre;
-    tab-size: 4;
-    line-height: 1.65;
-  }
-  /* Highlight tokens pulled from real Python syntax semantics. */
-  .tok-kw { color: #c792ea; }       /* keyword — violet */
-  .tok-str { color: #e3b341; }      /* string — amber */
-  .tok-num { color: #3ecf7e; }      /* number — green */
-  .tok-com { color: #6b655f; font-style: italic; }
-  .tok-fn { color: #82aaff; }       /* function — calm blue */
-  .tok-builtin { color: #82aaff; }
+.term-cursor {
+  display: inline-block;
+  white-space: pre;
+  background: var(--term-green-bright);
+  animation: term-blink 1.06s step-end infinite;
 }
-
-/* Hero / title reveal: fade up + de-blur. */
-@keyframes titleIn {
-  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
-  to { opacity: 1; transform: none; filter: blur(0); }
-}
-.animate-title-in { animation: titleIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-/* Staggered per-line reveal for the hero snippet. */
-@keyframes lineIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
-}
-.animate-line-in { animation: lineIn .5s cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-/* Blinking >>> prompt where the predicted output goes. */
-@keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-.animate-blink { animation: blink 1.05s steps(1) infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-title-in, .animate-line-in, .animate-blink { animation: none; }
-  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  .term-cursor {
+    animation: none;
+  }
+}
+
+/* Scrollbar in-theme (the scrollback is the whole app). */
+.term-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.term-scroll::-webkit-scrollbar-thumb {
+  background: var(--term-green-dim);
+}
+
+.term-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::selection {
+  background: var(--term-green);
+  color: var(--term-bg);
+}
+
+/* ---------------------------------------------------------------- the CRT
+   The terminal lives inside a machine: dark room, plastic bezel, curved
+   glass, scanlines over the phosphor. Overlays are pointer-events-none so
+   the shell (and the shader's mouse tracking) stay fully interactive. */
+
+.crt-room {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(4px, 1.6vmin, 20px);
+  background: radial-gradient(130% 110% at 50% 0%, #0e140e 0%, #060a06 50%, #020402 100%);
+}
+
+.crt-monitor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border-radius: clamp(12px, 2.2vmin, 28px);
+  background: linear-gradient(165deg, #232823 0%, #151915 45%, #0b0e0b 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.65),
+    0 24px 70px rgba(0, 0, 0, 0.75);
+  padding: clamp(8px, 2vmin, 24px);
+  padding-bottom: 0;
+}
+
+.crt-screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--term-bg);
+  border-radius: clamp(12px, 2.6vmin, 34px);
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 0, 0, 0.9),
+    inset 0 0 clamp(24px, 7vmin, 90px) rgba(0, 0, 0, 0.85),
+    inset 0 0 5px rgba(182, 255, 168, 0.14);
+  /* phosphor glow on everything drawn inside the tube */
+  text-shadow: 0 0 6px rgba(135, 237, 122, 0.28);
+}
+
+.crt-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 24%),
+    repeating-linear-gradient(0deg, rgba(4, 9, 4, 0.3) 0px, rgba(4, 9, 4, 0.3) 1px, transparent 1px, transparent 3px),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+/* the occasional electrical complaint of an old tube */
+.crt-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(160, 255, 150, 0.03);
+  opacity: 0;
+  animation: crt-flicker 7s linear infinite;
+}
+
+@keyframes crt-flicker {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  3% {
+    opacity: 0.9;
+  }
+  4% {
+    opacity: 0.1;
+  }
+  6% {
+    opacity: 0.5;
+  }
+  7% {
+    opacity: 0;
+  }
+  62% {
+    opacity: 0;
+  }
+  63% {
+    opacity: 0.6;
+  }
+  64% {
+    opacity: 0;
+  }
+}
+
+.crt-chin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: clamp(24px, 4.6vmin, 44px);
+  flex-shrink: 0;
+}
+
+.crt-brand {
+  font-size: clamp(9px, 1.6vmin, 14px);
+  letter-spacing: 0.28em;
+  color: #4d5c4d;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.crt-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--term-green);
+  box-shadow: 0 0 8px var(--term-green);
+  animation: crt-led 3.2s ease-in-out infinite;
+}
+
+@keyframes crt-led {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-overlay::after,
+  .crt-led {
+    animation: none;
+  }
 }
