@@ -20,3 +20,10 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 *.swp
+.vscode/
+
+# working notes — not part of the shipped project
+CLAUDE.md
+DESIGN.md
+VISION.md
+STARTING_PROMPT.md
